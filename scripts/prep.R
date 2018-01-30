@@ -11,13 +11,14 @@ cover <- midstory %>%
 cover <- na.omit(cover)
 
 #reconfigures data such that each row is a plot, species are in columns, and cover values are in cells
-cover <- spread(cover, key = "spp", value = "cover", fill = 0)
+cover <- spread(cover, key = "spp", value = "cover", fill = 0.0)
 
+cover.comm <- cover %>%
+  select(ARPA, CECO, CEIN, RIRO, CEVE, SYMO)
+ 
+cover.comm.sub <- cover.comm [,-c(1)]
 
-#density.c <- center %>%
- # filter(Spp == "ABCO" | Spp == "PSME") %>%
-  #filter(ht>=3) %>%
- # group_by(plot) %>%
-#  summarize(abco.density = length(which(Spp == "ABCO")), psme.density = length(which(Spp == "PSME")))
-
-#density.c <- mutate(density.c, den.ha.abco = density.c$abco.density*177, den.ha.psme = psme.density*177)
+#would use this to remove rare species if I could get it to work!! 
+#Plot col needs to be removed
+#library(labdsv)
+#vegtab(taxa = cover, minval = (nrow(cover==10)))

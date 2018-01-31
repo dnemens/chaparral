@@ -39,20 +39,23 @@ write.csv(domin, file="C:/Users/dnemens/Dropbox/CBO/chaparral/data sheets/domin.
 
 sto <- domin$storrie_rdnbr
 ch <-  domin$chips_rdnbr
-cov <- domin$abun
+cov <- factor(domin$abun)
+
 
 #plots all plots on severity coordinates, labels each plot by dominant spp
 plot (sto, ch, pch='', text(ch~sto, labels = cov), xlim=c(-500, 1100), xlab = "Storrie Fire severity", ylim=c(-500, 1100), ylab = "Chips Fire severity")
 
+#trying to plot this with ggplot!
 library(ggplot2)
+colors <- c("red", "green", "yellow", "orange", "blue", "purple", "pink", "black", "greenblue" )
+#aaargh!
 ggplot(domin, aes(x=sto, y=ch)) +
-  geom_point(aes(x=sto, y=ch)) +
-  geom_label(data=cov)
-
-  
-
-
-#would use this to remove rare species if I could get it to work!! 
-#Plot col needs to be removed first
-#library(labdsv)
-#vegtab(taxa = cover, minval = (nrow(cover==10)))
+  geom_point(aes(x=sto, y=ch), colour = "grey") +
+  geom_label(aes(sto), label = cov, fill=factor(cov))
+  geom_text(x=sto, y=ch, label=cov, colour=factor(cov))
+#bleeach!
+  scale_fill_manual(values=c("red", "green", "yellow", "orange", "blue", "purple", "pink", "black", "greenblue" ))
+  labs(y="Chips Fire severity", x="Storrie Fire severity") +
+  theme(axis.title = element_text(size=20), axis.text = element_text(size=12, colour = "black"))+
+  xlim(-500, 1100)+
+  ylim(-500, 1100)

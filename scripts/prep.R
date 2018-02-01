@@ -84,10 +84,10 @@ write.csv(cover1, file="C:/Users/dnemens/Dropbox/CBO/chaparral/data sheets/cover
 ######################################################################
 #exploratory plot
 
+#vectors
 sto <- domin$storrie_rdnbr
 ch <-  domin$chips_rdnbr
 cov <- factor(domin$abun)
-
 
 #plots all plots on severity coordinates, labels each plot by dominant spp
 plot (sto, ch, pch='', text(ch~sto, labels = cov, cex=.8), xlim=c(-500, 1100), xlab = "Storrie Fire severity", ylim=c(-500, 1100), ylab = "Chips Fire severity")

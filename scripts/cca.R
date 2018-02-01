@@ -8,7 +8,7 @@ cover1 <- read.csv("C:/Users/dnemens/Dropbox/CBO/chaparral/data sheets/cover1.cs
 library(vegan)
 
 cover.stand <- decostand(cover1[,3:4], "range")
-
+cover2 <- as.data.frame(cover2[2:9])
 cca.cover <- cca(X=cover2, Y=cover.stand)
 
 plot(cca.cover)

@@ -28,7 +28,7 @@ cover2 <- vegtab(taxa = cover3, minval = (.05*nrow(cover2)))
 cover2$fake <- 1
 
 #creates data file of reponse matrix with most common species
-write.csv(cover2, file="C:/Users/dnemens/Dropbox/CBO/chaparral/data sheets/cover2.csv")
+write.csv(cover2, file="C:/Users/dnemens/Dropbox/CBO/chaparral/data sheets/cover2.csv", row.names = F)
 
 ##############################################################################################
 #creates data frame with single response for each plot -- most common species in plot by cover
@@ -51,7 +51,7 @@ cover.comm <- merge(cover.s, rdnbr, by="Plot")
 
 domin <- data.frame(cover.comm, abun = most.abundant3)
 
-write.csv(domin, file="C:/Users/dnemens/Dropbox/CBO/chaparral/data sheets/domin.csv")
+write.csv(domin, file="C:/Users/dnemens/Dropbox/CBO/chaparral/data sheets/domin.csv", row.names = F)
 
 #########################################################################
 #creates a matrix of predictor variables
@@ -78,7 +78,7 @@ cover.sub <- cover.sub %>%
 rdnbr <- read.csv("C:/Users/dnemens/Dropbox/CBO/chaparral/data sheets/rdnbr.csv")
 cover1 <- merge(cover.sub, rdnbr, by="Plot")
 
-write.csv(cover1, file="C:/Users/dnemens/Dropbox/CBO/chaparral/data sheets/cover1.csv")
+write.csv(cover1, file="C:/Users/dnemens/Dropbox/CBO/chaparral/data sheets/cover1.csv", row.names = F)
 
 
 ######################################################################

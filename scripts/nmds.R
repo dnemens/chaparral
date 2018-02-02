@@ -19,7 +19,9 @@ z <- metaMDS(comm = cover2, distance = "bray", k=2, weakties=T)
 stressplot(z, lwd=2)
 
 #hierarchical clustering?
+#creates dissimilarity matrix
 cover2.dist <- vegdist(cover2.stand)
+#clusters
 cover.hclust <- hclust(d=cover2.dist, method = "ward.D2")
 plot(cover.hclust)
 g3 <- cutree(cover.hclust, k=3)

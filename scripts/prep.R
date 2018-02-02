@@ -1,4 +1,5 @@
 #preps data for analysis -- creates explan and response matrices, exploratory plot
+#uses focal-aok subplot data
 
 midstory <- read.csv("C:/Users/dnemens/Dropbox/CBO/chaparral/data sheets/midstory.csv")
 
@@ -23,8 +24,8 @@ cover <- as.data.frame(cover)
 cover3 <- as.data.frame(cover [, -c(1,16, 21, 23)]) 
 #removes rare species
 library(labdsv)
-cover2 <- vegtab(taxa = cover3, minval = (.05*nrow(cover2)))
-#adds dummy species with cover=1 for distance meaure
+cover2 <- vegtab(taxa = cover3, minval = (.05*nrow(cover3)))
+#adds dummy species with cover=1 for distance meaures
 cover2$fake <- 1
 
 #creates data file of reponse matrix with most common species
@@ -80,9 +81,9 @@ cover1 <- merge(cover.sub, rdnbr, by="Plot")
 
 write.csv(cover1, file="C:/Users/dnemens/Dropbox/CBO/chaparral/data sheets/cover1.csv", row.names = F)
 
-
 ######################################################################
 #exploratory plot
+domin <- read.csv(file="C:/Users/dnemens/Dropbox/CBO/chaparral/data sheets/domin.csv")
 
 #vectors
 sto <- domin$storrie_rdnbr
@@ -91,7 +92,7 @@ cov <- factor(domin$abun)
 
 #plots all plots on severity coordinates, labels each plot by dominant spp
 plot (sto, ch, pch='', text(ch~sto, labels = cov, cex=.8), xlim=c(-500, 1100), xlab = "Storrie Fire severity", ylim=c(-500, 1100), ylab = "Chips Fire severity")
-
+title(main="Focal oak midstory plot dominants by cover class")
 
 #trying to plot this with ggplot!
 library(ggplot2)

@@ -12,3 +12,4 @@ cover2 <- as.data.frame(cover2[2:9])
 cca.cover <- cca(X=cover2, Y=cover.stand)
 
 plot(cca.cover)
+

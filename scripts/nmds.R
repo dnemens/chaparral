@@ -28,7 +28,7 @@ g3 <- cutree(cover.hclust, k=3)
 #plots nmds
 plot(z, display="sites")
 ordicluster(ord=z, display = "sites", cluster=cover.hclust, prune=2)
-ordihull(ord=z, groups = g3, col="blue", lwd=2)
+ordihull(ord=z, groups = g3, col=c("blue", "green", "red"), lwd=2)
 
 #k means clustering?  
 k7 <- kmeans(cover2, centers = 7, nstart = 100)

@@ -32,6 +32,13 @@ plot(z, display="sites")
 ordicluster(ord=z, display = "sites", cluster=cover.hclust, prune=2)
 ordihull(ord=z, groups = g3, col=c("blue", "green", "red"), lwd=2)
 
+SC <- cover1$SC
+#indicator species analysis?
+library(labdsv)
+indval(cover2, clustering = SC)
+
+
+
 #k means clustering?  
 k7 <- kmeans(cover2, centers = 7, nstart = 100)
 ck2 <- cascadeKM(cover2, inf.gr = 2, sup.gr = 7)

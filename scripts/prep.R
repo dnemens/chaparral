@@ -60,14 +60,14 @@ write.csv(domin, file="C:/Users/dnemens/Dropbox/CBO/chaparral/data sheets/domin.
 cover.sub <- cover.s %>% 
   separate(Plot, c("Storrie", "Chips", "plot"), remove = F)
 
-cover.sub$Storrie [cover.sub$Storrie==1] <- "un"
+cover.sub$Storrie [cover.sub$Storrie==1] <- "low"
 cover.sub$Storrie [cover.sub$Storrie==2] <- "low" 
-cover.sub$Storrie [cover.sub$Storrie==3] <- "mod"
+cover.sub$Storrie [cover.sub$Storrie==3] <- "low"
 cover.sub$Storrie [cover.sub$Storrie==4] <- "high"
 
-cover.sub$Chips [cover.sub$Chips==1] <- "un"
+cover.sub$Chips [cover.sub$Chips==1] <- "low"
 cover.sub$Chips [cover.sub$Chips==2] <- "low" 
-cover.sub$Chips [cover.sub$Chips==3] <- "mod"
+cover.sub$Chips [cover.sub$Chips==3] <- "low"
 cover.sub$Chips [cover.sub$Chips==4] <- "high"
 
 cover.sub <- cover.sub[,1:3]

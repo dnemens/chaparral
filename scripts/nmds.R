@@ -10,8 +10,10 @@ library(vegan)
 
 #remove dummy species
 cover2 <- cover2[,-c(8)]
-#relativize data based on row max and plot total
+#relativize cover data based on row max and plot total
 cover2.stand <- wisconsin(cover2)
+#relativize predictor data by max val??
+cover1.stand
 
 #MDS
 z <- metaMDS(comm = cover2, distance = "bray", k=2, weakties=T)
@@ -32,11 +34,24 @@ plot(z, display="sites")
 ordicluster(ord=z, display = "sites", cluster=cover.hclust, prune=2)
 ordihull(ord=z, groups = g3, col=c("blue", "green", "red"), lwd=2)
 
+#overlays severity on nmds?
+sev.fit <- envfit(z ~ storrie_rdnbr + chips_rdnbr, data=cover1)
+plot(z, display = "sites")
+plot(sev.fit)
+
+#rotate with severity
+z.sev <- MDSrotate(z, cover1$storrie_rdnbr)
+plot(z.sev, display = "sites")
+text(domin, labels = cov) ###????
+
 SC <- cover1$SC
 #indicator species analysis?
-library(labdsv)
-indval(cover2, clustering = SC)
-
+library(indicspecies)
+cov.ind <- multipatt(cover2, cluster = SC)
+  
+  
+#similarity percentage?
+cov.simp <- simper(cover2, cov, permutations = 25)
 
 
 #k means clustering?  
@@ -48,21 +63,17 @@ k3 <- kmeans(cover2, centers = 3)
 library(cluster)
 k3.pam <- pam(x=cover2, metric = "euclidean", k=3)
 
-
-#points(z, display = "sites")
-
 points(z, pch=k3$clustering, col=k3.pam$clustering, cex=2)
 
 points 
 #overlays dominant species name onto plot
+domin <- read.csv("C:/Users/dnemens/Dropbox/CBO/chaparral/data sheets/domin.csv", header = T)
+cov <- domin$abun 
 text(domin, labels=cov)
 
 #overlays severity values onto plot
 text(z, labels=st, col="red")
 text(z, labels=ch, col="green", pos=4)
 
-
-#uses severity to rotate plot
-MDSrotate()
 
 

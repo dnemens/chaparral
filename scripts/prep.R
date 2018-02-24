@@ -1,5 +1,5 @@
 #preps data for analysis -- creates explan and response matrices, exploratory plot
-#uses focal-aok subplot data
+#uses focal-oak subplot data
 
 midstory <- read.csv("C:/Users/dnemens/Dropbox/CBO/chaparral/data sheets/midstory.csv")
 

@@ -26,13 +26,13 @@ cover2.dist <- vegdist(cover2.stand)
 #clusters
 cover.hclust <- hclust(d=cover2.dist, method = "ward.D2")
 plot(cover.hclust)
-g3 <- cutree(cover.hclust, k=3)
+g4 <- cutree(cover.hclust, k=4)
 
 #overlay clusters on NMDS
 #plots nmds
 plot(z, display="sites")
-ordicluster(ord=z, display = "sites", cluster=cover.hclust, prune=2)
-ordihull(ord=z, groups = g3, col=c("blue", "green", "red"), lwd=2)
+ordicluster(ord=z, display = "sites", cluster=cover.hclust, prune=3)
+ordihull(ord=z, groups = g4, col=c("blue", "green", "red", "orange"), lwd=2)
 
 #overlays severity on nmds?
 sev.fit <- envfit(z ~ storrie_rdnbr + chips_rdnbr, data=cover1)
@@ -42,7 +42,8 @@ plot(sev.fit)
 #rotate with severity
 z.sev <- MDSrotate(z, cover1$storrie_rdnbr)
 plot(z.sev, display = "sites")
-text(domin, labels = cov) ###????
+points(z.sev$points, col = Dom, pch=16) ###????
+text(z.sev$points, labels = Dom)
 
 SC <- cover1$SC
 #indicator species analysis?
@@ -68,7 +69,7 @@ points(z, pch=k3$clustering, col=k3.pam$clustering, cex=2)
 points 
 #overlays dominant species name onto plot
 domin <- read.csv("C:/Users/dnemens/Dropbox/CBO/chaparral/data sheets/domin.csv", header = T)
-cov <- domin$abun 
+Dom <- domin$abun 
 text(domin, labels=cov)
 
 #overlays severity values onto plot

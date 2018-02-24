@@ -1,30 +1,35 @@
-#preps center sub-plot data for analysis
+#preps center sub-plot data for analysis, creates data files of response data
 
 cover.cent <- read.csv("C:/Users/dnemens/Dropbox/CBO/chaparral/data sheets/center sub plot.csv", header = T)
 
 library(tidyverse)
 
-#summarizes data sheet, giving mean crown area by species
-cover.c.sum <- cover.cent %>%
+#summarizes data sheet, giving total crown area per species for each plot
+ccover.sum <- cover.cent %>%
   group_by(plot, Spp) %>%
-  summarize(cover = mean(crown.area))
+  summarize(cover = sum(crown.area))
 
-ccover <- spread(cover.c.sum, key = "Spp", value = "cover", fill = 0.0)
+ccover <- spread(ccover.sum, key = "Spp", value = "cover", fill = 0.0)
 
 #creates a species-only matrix (response)
 
 #removes columns: plot, trees and v1
-ccover3 <- as.data.frame(ccover [, -c(1,2, 3, 7, 25:32)]) 
+ccover1 <- as.data.frame(ccover [, -c(1,2, 3, 7, 25:32)]) 
 #removes rare species
 library(labdsv)
-ccover2 <- vegtab(taxa = ccover3, minval = (.05*nrow(ccover3)))
+ccover2 <- vegtab(taxa = ccover1, minval = (.05*nrow(ccover1)))
+
+#relativizes by row totals - gives RELATIVE cover for each species
+library(vegan)
+ccover2 <- decostand(ccover2, method = "total")
 
 #adds dummy species with cover=1 for distance meaures
 #ccover2$fake <- 1
 
-#creates data file of reponse matrix with most common species
-#write.csv(ccover2, file="C:/Users/dnemens/Dropbox/CBO/chaparral/data sheets/ccover2.csv", row.names = F
+#creates data file of reponse matrix with most common species >5% frequency
+write.csv(ccover2, file="C:/Users/dnemens/Dropbox/CBO/chaparral/data sheets/ccover2.csv", row.names = F)
 
+########################################################################################
 #creates data frame with single response for each plot -- most common species in plot by cover
 #finds species with highest cover for each plot, adds a column with that species' name
 most.abundant2 <- mapply(function(y)
@@ -49,13 +54,3 @@ cdomin <- data.frame(ccover.s, abun = most.abundant3)
 #saves data frame as new spreadsheet
 write.csv(cdomin, file="C:/Users/dnemens/Dropbox/CBO/chaparral/data sheets/cdomin.csv", row.names = F)
 #######################################################################
-#exploratory plot
-
-#vectors
-sto <- cdomin$storrie_rdnbr
-ch <-  cdomin$chips_rdnbr
-cov <- factor(cdomin$abun)
-
-#plots all plots on severity coordinates, labels each plot by dominant spp
-plot (sto, ch, pch='', text(ch~sto, labels = cov, cex=.8), xlim=c(-500, 1100), xlab = "Storrie Fire severity", ylim=c(-500, 1100), ylab = "Chips Fire severity")
-title(main="Center sub-plot dominants by crown area")

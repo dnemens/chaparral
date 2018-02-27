@@ -1,8 +1,7 @@
 #preps center sub-plot data for analysis, creates data files of response data
+library(tidyverse)
 
 cover.cent <- read.csv("C:/Users/dnemens/Dropbox/CBO/chaparral/data sheets/center sub plot.csv", header = T)
-
-library(tidyverse)
 
 #summarizes data sheet, giving total crown area per species for each plot
 ccover.sum <- cover.cent %>%
@@ -21,20 +20,20 @@ ccover2 <- vegtab(taxa = ccover1, minval = (.05*nrow(ccover1)))
 
 #relativizes by row totals - gives RELATIVE cover for each species
 library(vegan)
-ccover2 <- decostand(ccover2, method = "total")
+ccoverRel <- decostand(ccover2, method = "total")
 
 #adds dummy species with cover=1 for distance meaures
 #ccover2$fake <- 1
 
 #creates data file of reponse matrix with most common species >5% frequency
-write.csv(ccover2, file="C:/Users/dnemens/Dropbox/CBO/chaparral/data sheets/ccover2.csv", row.names = F)
+write.csv(ccoverRel, file="C:/Users/dnemens/Dropbox/CBO/chaparral/data sheets/ccoverRel.csv", row.names = F)
 
 ########################################################################################
 #creates data frame with single response for each plot -- most common species in plot by cover
 #finds species with highest cover for each plot, adds a column with that species' name
 most.abundant2 <- mapply(function(y)
-{a <- which(ccover2[y,] == max(ccover2[y,]), arr.ind=T)
-names(ccover2[a[,2]])} , 1:length(ccover2[,1]))
+{a <- which(ccoverRel[y,] == max(ccoverRel[y,]), arr.ind=T)
+names(ccoverRel[a[,2]])} , 1:length(ccoverRel[,1]))
 
 #add an NA if more than one species is dominant
 most.abundant3 <- mapply(function(y){
@@ -44,12 +43,9 @@ most.abundant3 <- mapply(function(y){
 }, 1:length(most.abundant2))
 
 #creates a new data frame with abundance codes for each plot, merged with rdnbr values
-ccover.s <- select_(ccover, "plot")
 rdnbr <- read.csv("C:/Users/dnemens/Dropbox/CBO/chaparral/data sheets/rdnbr.csv")
-rdnbr <- rdnbr %>% rename(plot=Plot)
-ccover.s <- merge(ccover.s, rdnbr, by="plot")
 
-cdomin <- data.frame(ccover.s, abun = most.abundant3)
+cdomin <- data.frame(rdnbr, abun = most.abundant3)
 
 #saves data frame as new spreadsheet
 write.csv(cdomin, file="C:/Users/dnemens/Dropbox/CBO/chaparral/data sheets/cdomin.csv", row.names = F)

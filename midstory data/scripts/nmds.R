@@ -1,9 +1,9 @@
 #for nmds using midstory
 
 #loads response matrix
-cover2 <- read.csv("C:/Users/dnemens/Dropbox/CBO/chaparral/data sheets/cover2.csv", header = T)
+cover2 <- read.csv("C:/Users/dnemens/Dropbox/CBO/chaparral/midstory data/data sheets/cover2.csv", header = T)
 #loads explan matrix
-cover1 <- read.csv("C:/Users/dnemens/Dropbox/CBO/chaparral/data sheets/cover1.csv", header = T)
+cover1 <- read.csv("C:/Users/dnemens/Dropbox/CBO/chaparral/midstory data/data sheets/cover1.csv", header = T)
 
 #NMDS
 library(vegan)
@@ -68,7 +68,7 @@ points(z, pch=k3$clustering, col=k3.pam$clustering, cex=2)
 
 points 
 #overlays dominant species name onto plot
-domin <- read.csv("C:/Users/dnemens/Dropbox/CBO/chaparral/data sheets/domin.csv", header = T)
+domin <- read.csv("C:/Users/dnemens/Dropbox/CBO/chaparral/data sheets/midstory data/domin.csv", header = T)
 Dom <- domin$abun 
 text(domin, labels=cov)
 

@@ -1,7 +1,7 @@
 #preps center sub-plot data for analysis, creates data files of response data
 library(tidyverse)
 
-cover.cent <- read.csv("C:/Users/dnemens/Dropbox/CBO/chaparral/data sheets/center sub plot.csv", header = T)
+cover.cent <- read.csv("C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/center sub plot.csv", header = T)
 
 #summarizes data sheet, giving total crown area per species for each plot
 ccover.sum <- cover.cent %>%
@@ -19,7 +19,12 @@ library(labdsv)
 ccover2 <- vegtab(taxa = ccover1, minval = (.05*nrow(ccover1)))
 
 #creates data file of reponse matrix with most common species >5% frequency
-write.csv(ccover2, file="C:/Users/dnemens/Dropbox/CBO/chaparral/data sheets/ccoverRaw.csv", row.names = F)
+write.csv(ccover2, file="C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/ccoverRaw.csv", row.names = F)
+
+#calculates actual PERCENT cover for each species
+ccoverAct <- ccover2/5648
+write.csv(ccoverAct, file="C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/ccoverAct.csv", row.names = F)
+
 
 #relativizes by row totals - gives RELATIVE cover for each species
 library(vegan)
@@ -29,7 +34,7 @@ ccoverRel <- decostand(ccover2, method = "total")
 #ccover2$fake <- 1
 
 #creates data file of RELATIVE COVER reponse matrix with most common species >5% frequency
-write.csv(ccoverRel, file="C:/Users/dnemens/Dropbox/CBO/chaparral/data sheets/ccoverRel.csv", row.names = F)
+write.csv(ccoverRel, file="C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/ccoverRel.csv", row.names = F)
 
 ########################################################################################
 #creates data frame with single response for each plot -- most common species in plot by cover
@@ -46,16 +51,16 @@ most.abundant3 <- mapply(function(y){
 }, 1:length(most.abundant2))
 
 #creates a new data frame with abundance codes for each plot, merged with rdnbr values
-rdnbr <- read.csv("C:/Users/dnemens/Dropbox/CBO/chaparral/data sheets/rdnbr.csv")
+rdnbr <- read.csv("C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/rdnbr.csv")
 
 cdomin <- data.frame(rdnbr, abun = most.abundant3)
 
 #saves data frame as new spreadsheet
-write.csv(cdomin, file="C:/Users/dnemens/Dropbox/CBO/chaparral/data sheets/cdomin.csv", row.names = F)
+write.csv(cdomin, file="C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/cdomin.csv", row.names = F)
 #######################################################################
 #creates a matrix of predictor variables
 ##creates Storrie and Chips categorical severity from plot # designations
-rdnbr <- read.csv("C:/Users/dnemens/Dropbox/CBO/chaparral/data sheets/rdnbr.csv")
+rdnbr <- read.csv("C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/rdnbr.csv")
 
 cover.sub <- rdnbr %>% 
   separate(Plot, c("Storrie", "Chips", "plot"), remove = F)
@@ -77,5 +82,5 @@ cover.sub <- cover.sub %>%
 #removes uncessary column
 cover1 <- cover.sub[,-3]
 
-write.csv(cover1, file="C:/Users/dnemens/Dropbox/CBO/chaparral/data sheets/ccover1.csv", row.names = F)
+write.csv(cover1, file="C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/ccover1.csv", row.names = F)
 

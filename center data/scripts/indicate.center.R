@@ -2,9 +2,9 @@
 library(tidyverse)
 
 #data frame of response variables (species relative cover)
-coverRel <- read.csv(file="C:/Users/dnemens/Dropbox/CBO/chaparral/data sheets/ccoverRel.csv")
+coverRel <- read.csv(file="C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/ccoverRel.csv")
 # dataframe of predictor variables (rdnbr, plot names & categories)
-cover <- read.csv(file="C:/Users/dnemens/Dropbox/CBO/chaparral/data sheets/ccover1.csv")
+cover <- read.csv(file="C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/ccover1.csv")
 
 cat <- cover$SC
 ##############################################################################################

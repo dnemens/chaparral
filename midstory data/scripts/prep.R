@@ -1,7 +1,7 @@
 #preps data for analysis -- creates explan and response matrices, exploratory plot
 #uses focal-oak subplot data
 
-midstory <- read.csv("C:/Users/dnemens/Dropbox/CBO/chaparral/data sheets/midstory.csv")
+midstory <- read.csv("C:/Users/dnemens/Dropbox/CBO/chaparral/midstory data/data sheets/midstory.csv")
 
 library(tidyverse)
 
@@ -21,7 +21,7 @@ cover <- as.data.frame(cover)
 #creates a species-only matrix (response)
 
 #removes columns: plot and tree species
-cover3 <- as.data.frame(cover [, -c(1,16, 21, 23)]) 
+cover3 <- as.data.frame(cover [, -c(1,16, 21, 23, 27, 28, 29, 30)]) 
 #removes rare species
 library(labdsv)
 cover2 <- vegtab(taxa = cover3, minval = (.05*nrow(cover3)))
@@ -29,7 +29,7 @@ cover2 <- vegtab(taxa = cover3, minval = (.05*nrow(cover3)))
 cover2$fake <- 1
 
 #creates data file of reponse matrix with most common species
-write.csv(cover2, file="C:/Users/dnemens/Dropbox/CBO/chaparral/data sheets/cover2.csv", row.names = F)
+write.csv(cover2, file="C:/Users/dnemens/Dropbox/CBO/chaparral/midstory data/data sheets/cover2.csv", row.names = F)
 
 ##############################################################################################
 #creates data frame with single response for each plot -- most common species in plot by cover
@@ -47,12 +47,12 @@ most.abundant3 <- mapply(function(y){
 
 #creates a new data frame with abundance codes for each plot, merges with rdnbr values
 cover.s <- select_(cover, "Plot")
-rdnbr <- read.csv("C:/Users/dnemens/Dropbox/CBO/chaparral/data sheets/rdnbr.csv")
+rdnbr <- read.csv("C:/Users/dnemens/Dropbox/CBO/chaparral/midstory data/data sheets/rdnbr.csv")
 cover.comm <- merge(cover.s, rdnbr, by="Plot")
 
 domin <- data.frame(cover.comm, abun = most.abundant3)
 
-write.csv(domin, file="C:/Users/dnemens/Dropbox/CBO/chaparral/data sheets/domin.csv", row.names = F)
+write.csv(domin, file="C:/Users/dnemens/Dropbox/CBO/chaparral/midstory data/data sheets/domin.csv", row.names = F)
 
 #########################################################################
 #creates a matrix of predictor variables
@@ -79,11 +79,11 @@ cover.sub <- cover.sub %>%
 rdnbr <- read.csv("C:/Users/dnemens/Dropbox/CBO/chaparral/data sheets/rdnbr.csv")
 cover1 <- merge(cover.sub, rdnbr, by="Plot")
 
-write.csv(cover1, file="C:/Users/dnemens/Dropbox/CBO/chaparral/data sheets/cover1.csv", row.names = F)
+write.csv(cover1, file="C:/Users/dnemens/Dropbox/CBO/chaparral/midstory data/data sheets/cover1.csv", row.names = F)
 
 ######################################################################
 #exploratory plot
-domin <- read.csv(file="C:/Users/dnemens/Dropbox/CBO/chaparral/data sheets/domin.csv")
+domin <- read.csv(file="C:/Users/dnemens/Dropbox/CBO/chaparral/midstory data/data sheets/domin.csv")
 
 #vectors
 sto <- domin$storrie_rdnbr

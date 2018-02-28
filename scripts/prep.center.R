@@ -18,6 +18,9 @@ ccover1 <- as.data.frame(ccover [, -c(1,2, 3, 7, 25:32)])
 library(labdsv)
 ccover2 <- vegtab(taxa = ccover1, minval = (.05*nrow(ccover1)))
 
+#creates data file of reponse matrix with most common species >5% frequency
+write.csv(ccover2, file="C:/Users/dnemens/Dropbox/CBO/chaparral/data sheets/ccoverRaw.csv", row.names = F)
+
 #relativizes by row totals - gives RELATIVE cover for each species
 library(vegan)
 ccoverRel <- decostand(ccover2, method = "total")
@@ -25,7 +28,7 @@ ccoverRel <- decostand(ccover2, method = "total")
 #adds dummy species with cover=1 for distance meaures
 #ccover2$fake <- 1
 
-#creates data file of reponse matrix with most common species >5% frequency
+#creates data file of RELATIVE COVER reponse matrix with most common species >5% frequency
 write.csv(ccoverRel, file="C:/Users/dnemens/Dropbox/CBO/chaparral/data sheets/ccoverRel.csv", row.names = F)
 
 ########################################################################################
@@ -50,3 +53,29 @@ cdomin <- data.frame(rdnbr, abun = most.abundant3)
 #saves data frame as new spreadsheet
 write.csv(cdomin, file="C:/Users/dnemens/Dropbox/CBO/chaparral/data sheets/cdomin.csv", row.names = F)
 #######################################################################
+#creates a matrix of predictor variables
+##creates Storrie and Chips categorical severity from plot # designations
+rdnbr <- read.csv("C:/Users/dnemens/Dropbox/CBO/chaparral/data sheets/rdnbr.csv")
+
+cover.sub <- rdnbr %>% 
+  separate(Plot, c("Storrie", "Chips", "plot"), remove = F)
+
+cover.sub$Storrie [cover.sub$Storrie==1] <- "low"
+cover.sub$Storrie [cover.sub$Storrie==2] <- "low" 
+cover.sub$Storrie [cover.sub$Storrie==3] <- "low"
+cover.sub$Storrie [cover.sub$Storrie==4] <- "high"
+
+cover.sub$Chips [cover.sub$Chips==1] <- "low"
+cover.sub$Chips [cover.sub$Chips==2] <- "low" 
+cover.sub$Chips [cover.sub$Chips==3] <- "low"
+cover.sub$Chips [cover.sub$Chips==4] <- "high"
+
+#combines severities from each fire into one column
+cover.sub <- cover.sub %>%
+  unite(SC, Storrie, Chips, sep = "/")
+
+#removes uncessary column
+cover1 <- cover.sub[,-3]
+
+write.csv(cover1, file="C:/Users/dnemens/Dropbox/CBO/chaparral/data sheets/ccover1.csv", row.names = F)
+

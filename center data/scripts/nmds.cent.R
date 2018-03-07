@@ -70,7 +70,7 @@ Sto <- ggplot(gz, aes(x=NMDS1, y=NMDS2))  +
   labs(colour="Fire severity\n(RdNBR)", title="Storrie Fire")+
   theme(plot.title = element_text(hjust=.5, size=15))
 
-Chip <- ggplot(gz, aes(x=NMDS1, y=NMDS2))  
+Chip <- ggplot(gz, aes(x=NMDS1, y=NMDS2))  +
   geom_point(aes(shape=dom), size=3)+
   theme_classic()+
   stat_contour(data = Cordi.mite.na, aes(x = x, y = y, z = z, colour = ..level..), cex=1.1)+

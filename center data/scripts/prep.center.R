@@ -9,14 +9,14 @@ rdnbr <- read.csv("C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheet
 cover.sub <- rdnbr %>% 
   separate(Plot, c("Storrie", "Chips", "plot"), remove = F)
 
-cover.sub$Storrie [cover.sub$Storrie==1] <- "low"
+cover.sub$Storrie [cover.sub$Storrie==1] <- "un"
 cover.sub$Storrie [cover.sub$Storrie==2] <- "low" 
-cover.sub$Storrie [cover.sub$Storrie==3] <- "low"
+cover.sub$Storrie [cover.sub$Storrie==3] <- "mod"
 cover.sub$Storrie [cover.sub$Storrie==4] <- "high"
 
-cover.sub$Chips [cover.sub$Chips==1] <- "low"
+cover.sub$Chips [cover.sub$Chips==1] <- "un"
 cover.sub$Chips [cover.sub$Chips==2] <- "low" 
-cover.sub$Chips [cover.sub$Chips==3] <- "low"
+cover.sub$Chips [cover.sub$Chips==3] <- "mod"
 cover.sub$Chips [cover.sub$Chips==4] <- "high"
 
 #combines severities from each fire into one column
@@ -36,39 +36,45 @@ ccover.sum <- cover.cent %>%
   group_by(plot, Spp) %>%
   summarize(cover = sum(crown.area))
 
+#transposes rows to columns
 ccover <- spread(ccover.sum, key = "Spp", value = "cover", fill = 0.0)
 
-#creates a species-only matrix (response)
+#creates a species-only matrix (response)####
 
 #removes columns: plot, trees and v1
 ccover1 <- as.data.frame(ccover [, -c(1,2, 3, 7, 25:32)]) 
 #removes rare species
 library(labdsv)
 ccover2 <- vegtab(taxa = ccover1, minval = (.05*nrow(ccover1)))
-
 #creates data file of reponse matrix with most common species >5% frequency
 write.csv(ccover2, file="C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/ccoverRaw.csv", row.names = F)
+
+#creates data frame of ALL most common species, including trees####
+ccover.all <- as.data.frame(ccover [,-1])
+ccover.all <- vegtab(taxa=ccover.all, minval = (.05*nrow(ccover)))
+#relativizes by row totals - gives RELATIVE cover for each species
+library(vegan)
+ccover.allR <- decostand(ccover.all, method = "total")
+write.csv(ccover.allR, file="C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/ccoverAllR.csv", row.names = F)
 
 #calculates actual PERCENT cover for each species
 ccoverAct <- ccover2/5648
 write.csv(ccoverAct, file="C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/ccoverAct.csv", row.names = F)
 
 #relativizes by row totals - gives RELATIVE cover for each species
-library(vegan)
 ccoverRel <- decostand(ccover2, method = "total")
-
 #creates data file of RELATIVE COVER reponse matrix with most common species >5% frequency
 write.csv(ccoverRel, file="C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/ccoverRel.csv", row.names = F)
 
 #########################################################
 #removes blank rows!!  
-Nozero <- data.frame(ccoverAct, cover1)
-Nozero2 <- Nozero[rowSums(Nozero[,1:7])!=0,]
+Nozero <- data.frame(ccover.allR, cover1)
+Nozero2 <- Nozero[rowSums(Nozero[,1:12])!=0,]
 
-ccoverAct.no0 <- Nozero2[,1:7]
-ccover1.no0 <- Nozero2[,8:11]
+ccoverallR.no0 <- Nozero2[,1:12]
+ccover1.no0 <- Nozero2[,13:16]
 
-write.csv(ccoverAct.no0, file="C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/ccoverAct.no0.csv", row.names = F)
+write.csv(ccoverallR.no0, file="C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/ccoverallR.no0.csv", row.names = F)
 write.csv(ccover1.no0, file="C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/ccover1.no0.csv", row.names = F)
 
 

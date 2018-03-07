@@ -2,18 +2,21 @@
 
 library(vegan)
 
-#loads response matrix - RELATIVE cover for each spp
-cover2 <- read.csv("C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/ccoverAct.no0.csv", header = T)
+#loads response matrix - importance values for each spp
+cover2 <- read.csv("C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/importance.csv", header = T)
 
 #loads explan matrix (rdnbr, severity combos)
-cover1 <- read.csv("C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/ccover1.no0.csv", header = T)
+cover <- read.csv("C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/ccover1.imp.csv", header = T)
 
-#creates vector for severity combo category
-cat <- cover1$SC
+#creates vector forseverity combo category
+cat <- cover$SC
+#vector for most important species in each plot
+dom <- cover$dom
 
-#loads dat frame with dominant species for each plot
-domin <- read.csv("C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/cdomin.no0.csv", header = T)
-dom <- domin$abun
+#loads dat frame with dominant species for each plot 
+####would need to redo domin for 91 plots
+#domin <- read.csv("C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/cdomin.no0.csv", header = T)
+#dom <- domin$abun
 
 #relativize cover data based on row max and plot total
 #cover2.stand <- wisconsin(cover2)
@@ -24,7 +27,7 @@ dom <- domin$abun
 #cover2$fake <- .01
 
 #MDS
-z <- metaMDS(comm = cover2, k=2, distance = "bray", weakties=T, trymax = 100, autotransform = FALSE)
+z <- metaMDS(comm = cover2, k=3, distance = "horn", weakties=T, trymax = 100, autotransform = FALSE)
 
 stressplot(z, lwd=2)
 z$stress
@@ -34,22 +37,27 @@ plot(z, display="sites")
 #adds points, color-coded by dominant species
 points(z, col = dom, pch=20, cex=1.5)
 
-#overlays storrie and chips severity values onto ordination
-ordi <- ordisurf(z, cover1$chips_rdnbr, main="Burn severity")
-#adds points, color-coded by dominant species
-points(z, col = dom, pch=20, cex=1.5)
+##overlays severity values onto ordination####
 
-
+#storrie severity
+ordiSto <- ordisurf(z, cover$storrie_rdnbr, main="Burn severity")
 #extracts variables from ordisurf for plotting in ggplot
-ordi.grid <- ordi$grid #extracts the ordisurf object
-str(ordi.grid) #it's a list though - cannot be plotted as is
-ordi.mite <- expand.grid(x = ordi.grid$x, y = ordi.grid$y) #get x and ys
-ordi.mite$z <- as.vector(ordi.grid$z) #unravel the matrix for the z scores
-ordi.mite.na <- data.frame(na.omit(ordi.mite)) #gets rid of the nas
+Sordi.grid <- ordiSto$grid #extracts the ordisurf object
+Sordi.mite <- expand.grid(x = Sordi.grid$x, y = ordi.grid$y) #get x and ys
+Sordi.mite$z <- as.vector(Sordi.grid$z) #unravel the matrix for the z scores
+Sordi.mite.na <- data.frame(na.omit(ordi.mite)) #gets rid of the nas
+
+#chips severity 
+ordiChip <- ordisurf(z, cover$chips_rdnbr, main="Burn severity")
+#extracts variables from ordisurf for plotting in ggplot
+Cordi.grid <- ordiChip$grid #extracts the ordisurf object
+Cordi.mite <- expand.grid(x = Cordi.grid$x, y = ordi.grid$y) #get x and ys
+Cordi.mite$z <- as.vector(Cordi.grid$z) #unravel the matrix for the z scores
+Cordi.mite.na <- data.frame(na.omit(Cordi.mite)) #gets rid of the nas
 
 
 #or ggplot
-gz <- data.frame(dom, scores(z), cover1$storrie_rdnbr, cover1$chips_rdnbr)
+gz <- data.frame(dom, scores(z), cover$storrie_rdnbr, cover$chips_rdnbr)
 gz <- na.omit(gz)
   
 library(ggplot2)
@@ -57,15 +65,15 @@ library(directlabels)
 Sto <- ggplot(gz, aes(x=NMDS1, y=NMDS2))  +
   geom_point(aes(shape=dom), size=3)+
   theme_classic()+
-  stat_contour(data = ordi.mite.na, aes(x = x, y = y, z = z, colour = ..level..), cex=1.1)+
+  stat_contour(data = Sordi.mite.na, aes(x = x, y = y, z = z, colour = ..level..), cex=1.1)+
   scale_color_gradient(low = "green", high ="red")+
   labs(colour="Fire severity\n(RdNBR)", title="Storrie Fire")+
   theme(plot.title = element_text(hjust=.5, size=15))
 
-Chip <- ggplot(gz, aes(x=NMDS1, y=NMDS2))  +
+Chip <- ggplot(gz, aes(x=NMDS1, y=NMDS2))  
   geom_point(aes(shape=dom), size=3)+
   theme_classic()+
-  stat_contour(data = ordi.mite.na, aes(x = x, y = y, z = z, colour = ..level..), cex=1.1)+
+  stat_contour(data = Cordi.mite.na, aes(x = x, y = y, z = z, colour = ..level..), cex=1.1)+
   scale_color_gradient(low = "green", high ="red")+
   labs(colour="Fire severity\n(RdNBR)", title="Chips Fire")+
   theme(plot.title = element_text(hjust=.5, size=15))

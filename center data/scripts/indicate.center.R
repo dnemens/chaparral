@@ -1,7 +1,7 @@
 #indicator species analysis of center sub data  
 library(tidyverse)
 
-#data frame of response variables (ALL common species relative cover)
+#data frame of response variables (ALL common species importance values)
 cover2 <- read.csv(file="C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/importance.csv")
 # dataframe of predictor variables (rdnbr, plot names & categories)
 cover <- read.csv(file="C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/ccover1.imp.csv")
@@ -45,37 +45,45 @@ ind1$indval
 summary(ind1)
 ############################################################################################
 #combine indicator species analysis with k means clustering####
+#conduct a kmeans cluster analysis
 k <- kmeans(cover2, centers = 4, nstart = 100)
 
-ck <- cascadeKM(cover2, inf.gr = 2, sup.gr = 11) #evaluates # of groups
+#choose # of groups
+ck <- cascadeKM(cover2, inf.gr = 2, sup.gr = 11) #evaluates # of groups 
 plot(ck) #indicates that 4 groups are best
-
+ 
 #runs combined analysis 
+#indicator species analysis with kmeans cluster determining groups
 kind <- multipatt(cover2, k$cluster, control = how(nperm = 999))
 summary(kind, indvalcomp = TRUE)
 
+#
 library(cluster)
 k4.pam <- pam(x=cover2, metric = "euclidean", k=4)
 
+###############################################################
 #creates NMDS ordination
 library(vegan)
 z <- metaMDS(comm = cover2, k=4, distance = "horn", weakties=T, trymax = 100, autotransform = FALSE)
 plot(z, display = "sites")
-points(z, pch=k$clustering, col=k4.pam$clustering, cex=2)
-
-
+points(z, pch=k$cluster, col=k$cluster, cex=2)
+ordihull(z, groups = k$cluster, col=k$cluster)
+################################################################
 #rotate NMDS by storrie severity####
 z.sev <- MDSrotate(z, cover$storrie_rdnbr)
 plot(z.sev, display = "sites")
 dom <- cover$dom
-points(z.sev$points, col=k4.pam$clustering, cex=2) 
-
+points(z.sev$points, col=k$cluster, cex=2) 
+ordihull(z.sev, groups = k$cluster, col=c("black", "red", "green", "blue"))
 title(main = "Rotated with Storrie on X")
 
 #overlays chips severity as vectors onto nmds
 sev.fit <- envfit(z ~ storrie_rdnbr + chips_rdnbr, data=cover)
 plot(z, display = "sites")
 plot(sev.fit)
+points(sev.fit$points, col=k$cluster, cex=2) 
+plot(z, display="sites")
+ordicluster(ord=sev.fit, display = "sites", cluster=k4.pam, prune=3)
 
 #############################################################################
 #hierarchical clustering?#########
@@ -83,12 +91,10 @@ plot(sev.fit)
 cover2.dist <- vegdist(cover2, method = "horn")
 #clusters
 cover.hclust <- hclust(d=cover2.dist, method = "ward.D2")
-plot(cover.hclust)
+plot(cover.hclust, labels = cover1$SC)
 g4 <- cutree(cover.hclust, k=4)
-#plots nmds
-plot(z, display="sites")
-ordicluster(ord=z, display = "sites", cluster=cover.hclust, prune=4)
-ordihull(ord=z, groups = g4, col=c("blue", "green", "red", "orange"), lwd=2)
+
+
 ###########################################################################################
 #creates categorical combined severity variable based on RdNBR values####
 cover.cat <- mutate(cover, sto="", chip="")

@@ -1,17 +1,41 @@
 #indicator species analysis of center sub data  
 library(tidyverse)
 
-#data frame of response variables (species relative cover)
-coverRel <- read.csv(file="C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/ccoverRel.csv")
+#data frame of response variables (ALL common species relative cover)
+cover2 <- read.csv(file="C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/importance.csv")
 # dataframe of predictor variables (rdnbr, plot names & categories)
-cover <- read.csv(file="C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/ccover1.csv")
+cover <- read.csv(file="C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/ccover1.imp.csv")
 
-cat <- cover$SC
+#removes old categorical column
+cover <- cover[,-2]
+
+###creates Storrie and Chips categorical severity from plot # designations####
+cover.sub <- cover %>% 
+  separate(Plot, c("Storrie", "Chips", "plot"), remove = F)
+
+cover.sub$Storrie [cover.sub$Storrie==1] <- "un"
+cover.sub$Storrie [cover.sub$Storrie==2] <- "low" 
+cover.sub$Storrie [cover.sub$Storrie==3] <- "mod"
+cover.sub$Storrie [cover.sub$Storrie==4] <- "high"
+
+cover.sub$Chips [cover.sub$Chips==1] <- "un"
+cover.sub$Chips [cover.sub$Chips==2] <- "low" 
+cover.sub$Chips [cover.sub$Chips==3] <- "mod"
+cover.sub$Chips [cover.sub$Chips==4] <- "high"
+
+#combines severities from each fire into one column
+cover.sub <- cover.sub %>%
+  unite(SC, Storrie, Chips, sep = "/")
+
+#removes uncessary column "plot"
+cover1 <- cover.sub[,-3]
+
+#creates vector of storrie/chips severity combination
+cat <- as.factor(cover1$SC)
 ##############################################################################################
-
 #indicator species analysis?
 library(indicspecies)
-cov.ind <- multipatt(coverRel, cluster = cat, control = how(nperm = 999))
+cov.ind <- multipatt(cover2, cluster = cat, control = how(nperm = 999), duleg = T)
 cov.ind$sign
 summary(cov.ind)
 

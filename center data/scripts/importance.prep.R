@@ -2,6 +2,7 @@
 
 library(tidyverse)
 library(vegan)
+library(labdsv)
 
 ##################################################################################
 #creates a matrix of predictor variables
@@ -79,8 +80,6 @@ most.abundant3 <- mapply(function(y){
   {NA} else
   {most.abundant2[[y]]}
 }, 1:length(most.abundant2))
-
-
 ##################################################################################
 #removes blank rows!!  
 Nozero <- data.frame(imp, cover1, dom=most.abundant3)

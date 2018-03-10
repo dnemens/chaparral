@@ -2,7 +2,7 @@
 library(tidyverse)
 
 #######################################################################
-#creates a matrix of predictor variables
+#creates a matrix of predictor variables####
 ##creates Storrie and Chips categorical severity from plot # designations
 rdnbr <- read.csv("C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/rdnbr.csv")
 
@@ -11,12 +11,12 @@ cover.sub <- rdnbr %>%
 
 cover.sub$Storrie [cover.sub$Storrie==1] <- "low"
 cover.sub$Storrie [cover.sub$Storrie==2] <- "low" 
-cover.sub$Storrie [cover.sub$Storrie==3] <- "low"
+cover.sub$Storrie [cover.sub$Storrie==3] <- "mod"
 cover.sub$Storrie [cover.sub$Storrie==4] <- "high"
 
 cover.sub$Chips [cover.sub$Chips==1] <- "low"
 cover.sub$Chips [cover.sub$Chips==2] <- "low" 
-cover.sub$Chips [cover.sub$Chips==3] <- "low"
+cover.sub$Chips [cover.sub$Chips==3] <- "mod"
 cover.sub$Chips [cover.sub$Chips==4] <- "high"
 
 #combines severities from each fire into one column
@@ -26,9 +26,11 @@ cover.sub <- cover.sub %>%
 #removes uncessary column
 cover1 <- cover.sub[,-3]
 
-write.csv(cover1, file="C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/ccover1.csv", row.names = F)
-#######################################################################################
+#saves data file of predictors, 16 combos, WITH 0 plots
+write.csv(cover1, file="C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/cover1_93.csv", row.names = F)
 
+#######################################################################################
+#create a species-only response matrix####
 cover.cent <- read.csv("C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/center sub plot.csv", header = T)
 
 #summarizes data sheet, giving total crown area per species for each plot
@@ -38,52 +40,46 @@ ccover.sum <- cover.cent %>%
 
 #transposes rows to columns
 ccover <- spread(ccover.sum, key = "Spp", value = "cover", fill = 0.0)
+#removes "plot" column
+ccover <- ccover[,-1]
 
-#creates a species-only matrix (response)####
-
-#removes columns: plot, trees and v1
-ccover1 <- as.data.frame(ccover [, -c(1,2, 3, 7, 25:32)]) 
 #removes rare species
 library(labdsv)
-ccover2 <- vegtab(taxa = ccover1, minval = (.05*nrow(ccover1)))
-#creates data file of reponse matrix with most common species >5% frequency
-write.csv(ccover2, file="C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/ccoverRaw.csv", row.names = F)
+cover2 <- vegtab(taxa = ccover, minval = (.05*nrow(ccover)))
 
-#creates data frame of ALL most common species, including trees####
-ccover.all <- as.data.frame(ccover [,-1])
-ccover.all <- vegtab(taxa=ccover.all, minval = (.05*nrow(ccover)))
-#relativizes by row totals - gives RELATIVE cover for each species
-library(vegan)
-ccover.allR <- decostand(ccover.all, method = "total")
-write.csv(ccover.allR, file="C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/ccoverAllR.csv", row.names = F)
-
-#calculates actual PERCENT cover for each species
-ccoverAct <- ccover2/5648
-write.csv(ccoverAct, file="C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/ccoverAct.csv", row.names = F)
-
-#relativizes by row totals - gives RELATIVE cover for each species
-ccoverRel <- decostand(ccover2, method = "total")
-#creates data file of RELATIVE COVER reponse matrix with most common species >5% frequency
-write.csv(ccoverRel, file="C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/ccoverRel.csv", row.names = F)
-
-#########################################################
-#removes blank rows!!  
-Nozero <- data.frame(ccover.allR, cover1)
+#removes plots with no species present
+Nozero <- data.frame(cover2, cover1)
 Nozero2 <- Nozero[rowSums(Nozero[,1:12])!=0,]
 
-ccoverallR.no0 <- Nozero2[,1:12]
-ccover1.no0 <- Nozero2[,13:16]
+cover2 <- Nozero2[,1:12]
+cover1 <- Nozero2[,13:16]
+#########################################################
+#create spreadsheets####
 
-write.csv(ccoverallR.no0, file="C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/ccoverallR.no0.csv", row.names = F)
-write.csv(ccover1.no0, file="C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/ccover1.no0.csv", row.names = F)
+#saves data file of predictors, 16 combos, without 0 plots
+write.csv(cover1, file="C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/cover1.csv", row.names = F)
+
+#saves data file of resulting reponse matrix, without 0 plots  -- 12 species left!####
+write.csv(cover2, file="C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/coverRaw.csv", row.names = F)
+######################################################################
+#other transformations: relative % cover, actual % cover
+
+#calculates actual PERCENT cover for each species
+coverAct <- cover2/5648
+write.csv(coverAct, file="C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/coverAct.csv", row.names = F)
+
+#relativizes by row totals - gives RELATIVE cover for each species
+coverRel <- decostand(cover2, method = "total")
+write.csv(coverRel, file="C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/coverRel.csv", row.names = F)
 
 
 ########################################################################################
-#creates data frame with single response for each plot -- most common species in plot by cover
+#DOMINANT SPECIES####
+#creates data frame with single response for each plot -- most common species in plot by relative cover
 #finds species with highest cover for each plot, adds a column with that species' name
 most.abundant2 <- mapply(function(y)
-{a <- which(ccoverRel[y,] == max(ccoverRel[y,]), arr.ind=T)
-names(ccoverRel[a[,2]])} , 1:length(ccoverRel[,1]))
+{a <- which(coverRel[y,] == max(coverRel[y,]), arr.ind=T)
+names(coverRel[a[,2]])} , 1:length(coverRel[,1]))
 
 #add an NA if more than one species is dominant
 most.abundant3 <- mapply(function(y){
@@ -93,31 +89,11 @@ most.abundant3 <- mapply(function(y){
 }, 1:length(most.abundant2))
 
 #creates a new data frame with abundance codes for each plot, merged with rdnbr values
-rdnbr <- read.csv("C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/rdnbr.csv")
+cover1 <- read.csv("C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/cover1.csv")
 
-cdomin <- data.frame(rdnbr, abun = most.abundant3)
+cdomin <- data.frame(cover1, abun = most.abundant3)
 
 #saves data frame as new spreadsheet
 write.csv(cdomin, file="C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/cdomin.csv", row.names = F)
 
 ################################################################
-#same as above, removing plots with 0's
-
-#creates data frame with single response for each plot -- most common species in plot by cover
-#finds species with highest cover for each plot, adds a column with that species' name
-most.abundant2 <- mapply(function(y)
-{a <- which(ccoverRel.no0[y,] == max(ccoverRel.no0[y,]), arr.ind=T)
-names(ccoverRel.no0[a[,2]])} , 1:length(ccoverRel.no0[,1]))
-
-#add an NA if more than one species is dominant
-most.abundant3 <- mapply(function(y){
-  if(length(most.abundant2[[y]]) > 1)
-  {NA} else
-  {most.abundant2[[y]]}
-}, 1:length(most.abundant2))
-
-cdomin <- data.frame(cover1.no0, abun = most.abundant3)
-
-#saves data frame as new spreadsheet
-write.csv(cdomin, file="C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/cdomin.no0.csv", row.names = F)
-

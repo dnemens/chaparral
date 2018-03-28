@@ -9,12 +9,12 @@ rdnbr <- read.csv("C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheet
 cover.sub <- rdnbr %>% 
   separate(Plot, c("Storrie", "Chips", "plot"), remove = F)
 
-cover.sub$Storrie [cover.sub$Storrie==1] <- "low"
+cover.sub$Storrie [cover.sub$Storrie==1] <- "un"
 cover.sub$Storrie [cover.sub$Storrie==2] <- "low" 
 cover.sub$Storrie [cover.sub$Storrie==3] <- "mod"
 cover.sub$Storrie [cover.sub$Storrie==4] <- "high"
 
-cover.sub$Chips [cover.sub$Chips==1] <- "low"
+cover.sub$Chips [cover.sub$Chips==1] <- "un"
 cover.sub$Chips [cover.sub$Chips==2] <- "low" 
 cover.sub$Chips [cover.sub$Chips==3] <- "mod"
 cover.sub$Chips [cover.sub$Chips==4] <- "high"
@@ -52,11 +52,11 @@ Nozero <- data.frame(cover2, cover1)
 Nozero2 <- Nozero[rowSums(Nozero[,1:12])!=0,]
 
 cover2 <- Nozero2[,1:12]
-cover1 <- Nozero2[,13:16]
+cover1 <- Nozero2[,13:19]
 #########################################################
 #create spreadsheets####
 
-#saves data file of predictors, 16 combos, without 0 plots
+#saves data file of predictors, 9 combos, without 0 plots
 write.csv(cover1, file="C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/cover1.csv", row.names = F)
 
 #saves data file of resulting reponse matrix, without 0 plots  -- 12 species left!####

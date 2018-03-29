@@ -30,16 +30,18 @@ summary(phi)
 #combine indicator species analysis with k means clustering####
 #choose # of groups
 
-ck <- cascadeKM(cover2, inf.gr = 2, sup.gr = 12) #evaluates # of groups 
+ck <- cascadeKM(cover2, inf.gr = 2, sup.gr = 10) #evaluates # of groups 
 plot(ck) #indicates that 4 groups are best?
 
 #conduct a kmeans cluster analysis
-k <- kmeans(cover2, centers = 5, nstart = 100)
+k <- kmeans(cover2, centers = 4, nstart = 100)
 
 #runs combined analysis 
 #indicator species analysis with kmeans cluster determining groups
-#kind <- multipatt(cover2, k$cluster, control = how(nperm = 999))
-#summary(kind, indvalcomp = TRUE)
+kind <- multipatt(cover2, k$cluster, control = how(nperm = 999))
+summary(kind, indvalcomp = TRUE)
+kind.val <- indval(cover2, k$cluster)
+summary(kind.val)
 
 #should I use the pam function, since the distance matrix above may not be appropriate?  
 library(cluster)
@@ -50,15 +52,24 @@ for (k in 2:10) {
   asw[k] <- pam(cov.dist, k = k) $ silinfo $ avg.width
 }
 cat("silhouette-optimal # of clusters:", which.max(asw), "\n")
-k4.pam <- pam(x=cov.dist, k=6)
-summary(k4.pam)
-k4.pam$clustering
+k6.pam <- pam(x=cov.dist, k=6)
+summary(k6.pam)
+k6.pam$clustering
 ###############################################################
 #creates NMDS ordination####
 z <- metaMDS(comm = cover2, k=3, distance = "horn", weakties=T, trymax = 100, autotransform = FALSE)
 z$stress
-plot(z, display = "sites")
-points(z, pch=20, col=k$cluster, cex=2)
+
+#ordination using cluster analysis to determine groups (not severity)####
+z.cluster <- MDSrotate(z, cover$storrie_rdnbr)
+plot(z.cluster, display = "sites")
+ordihull(z.cluster, groups = k$cluster, col = c("red", "green", "blue", "orange"))
+text(z.cluster, labels = kind$cluster)
+cluster.fit <- envfit(z.cluster ~ storrie_rdnbr + chips_rdnbr, data=cover, na.rm=T)
+plot(cluster.fit)
+clus <- as.factor(kind$cluster)
+
+ex1 <- mrpp(cover2, grouping = k$cluster, distance = "bray") #A: 0.5729 
 
 ################################################################
 #rotate NMDS by storrie severity####

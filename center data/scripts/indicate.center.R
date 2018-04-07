@@ -1,8 +1,10 @@
-#indicator species analysis of center sub data  
+#indicator species analysis of center sub-plot data  
 library(tidyverse)
 library(vegan)
+library(indicspecies)
+library(labdsv)
 
-#data frame of response variables (ALL common species Relative cover values)
+#data frame of response variables (all common species Relative cover values)
 cover2 <- read.csv(file="C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/coverRel.csv")
 # dataframe of predictor variables (rdnbr, plot names & categories)
 cover <- read.csv(file="C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/cover1.csv")
@@ -11,25 +13,23 @@ cover <- read.csv(file="C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data 
 cat <- as.factor(cover$SC)
 ##############################################################################################
 #indicator species analysis using field-determined severity combinations####
-library(indicspecies)
 cov.ind <- multipatt(cover2, cluster = cat, control = how(nperm = 999), duleg = T)
 summary(cov.ind, indvalcomp = T)
 
 #extracts indicator value for each significant species
-library(labdsv)
 ind1 <- indval(cover2, cat)
 ind1$indval
 summary(ind1, alpha=1)
 
 #check correlation usings Pearson's Phi
 #convert cover data to a presence/absence matrix
-cover2pa <- as.data.frame(ifelse(cover2>0, 1, 0))
-phi <- multipatt(cover2pa, cat, func = "r.g", control=how(nperm=999), duleg = T)
-summary(phi)
+#cover2pa <- as.data.frame(ifelse(cover2>0, 1, 0))
+#phi <- multipatt(cover2pa, cat, func = "r.g", control=how(nperm=999), duleg = T)
+#summary(phi)
 ############################################################################################
 #combine indicator species analysis with k means clustering####
-#choose # of groups
 
+#choose # of groups
 ck <- cascadeKM(cover2, inf.gr = 2, sup.gr = 10) #evaluates # of groups 
 plot(ck) #indicates that 4 groups are best?
 

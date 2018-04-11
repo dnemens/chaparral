@@ -8,6 +8,8 @@ library(labdsv)
 cover2 <- read.csv(file="C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/coverRel.csv")
 # dataframe of predictor variables (rdnbr, plot names & categories)
 cover <- read.csv(file="C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/cover1.csv")
+#add dominant species for each plot
+dom <- read.csv(file="C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/cdomin.csv")
 
 #creates vector of storrie/chips severity combination
 cat <- as.factor(cover$SC)
@@ -78,22 +80,15 @@ plot(z.sev, display = "sites")
 #code points by cluster from kmeans
 points(z.sev$points, col=k$cluster, pch=20, cex=2)
 #text(z.sev, labels = cover$SC)
-#text(z.sev, labels=dom$abun, cex=1.2, col="black") 
+text(z.sev, labels=dom$abun, cex=1.2, col="black") 
 #ordihull(z.sev, groups = k$cluster, col=c("black", "red", "green", "blue"))
 title(main = "NMS with Dominant species overlaid")
 
 #add continuous severity vectors
-sev.fit <- envfit(z.sev ~ storrie_rdnbr + chips_rdnbr + slope , data=cover, na.rm=T)
+sev.fit <- envfit(z.sev ~ storrie_rdnbr + chips_rdnbr , data=cover, na.rm=T)
 #aspect and elevation were not signif
 #overlays vectors onto rotated nmds
 plot(sev.fit)
 sev.fit$vectors
-
-#add dominant species for each plot
-dom <- read.csv(file="C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/cdomin.csv")
-text(z.sev, labels = dom$abun)
-
-#add vectors for environmental variables
-
 
 #ordicluster(ord=sev.fit, display = "sites", cluster=k, prune=3)

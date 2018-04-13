@@ -36,10 +36,12 @@ z.sev <- MDSrotate(z, cover$storrie_rdnbr)
 plot(z.sev, display = "sites")
 
 #code points by dominant species
-points(z.sev$points, col=dom$abun, pch=20, cex=2)
-text(0,.55, "CEIN", cex=1.2, col="blue") 
-text(.55,-.7, "CECO", cex=1.2, col="green4") 
-text(-.6,-.8, "ABCO/QUKE", cex=1.2, col="black") 
+cols <- rainbow(12)
+palette(col.rainbow)
+points(z.sev$points, bg=dom$abun, pch=21, cex=1.3)
+text(.1,.5, "CEIN", cex=1.2, col="black") 
+text(.5,-.7, "CECO", cex=1.2, col="black") 
+text(-.5,-.75, "ABCO/QUKE", cex=1.2, col="black") 
 title(main = "NMS with dominant species providing color coding")
 
 #add continuous severity vectors
@@ -51,9 +53,9 @@ sev.fit$vectors
 
 # add circles around clusters of points  
 library(plotrix)
-draw.ellipse(-.1, .6, a=.5, b=.2, border = "blue", lwd=2)
-draw.ellipse(.75, -.75, a=.5, b=.2, border = "green4", lwd=2)
-draw.ellipse(-.8, -.85, a=.7, b=.2, border = "black", lwd=2)
+draw.ellipse(-.1, .6, a=.5, b=.25, border = "black", lwd=2) #cein
+draw.ellipse(.75, -.75, a=.5, b=.18, border = "black", lwd=2) #ceco
+draw.ellipse(-.6, -.85, a=.7, b=.2, border = "black", lwd=2) #abco/quke
 #####################################################
 #plot with ggplot
 

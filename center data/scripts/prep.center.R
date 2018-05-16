@@ -1,5 +1,7 @@
 #preps center sub-plot data for analysis, creates data files of response data
 library(tidyverse)
+library(vegan)
+library(labdsv)
 
 #######################################################################
 #creates a matrix of predictor variables####
@@ -9,15 +11,15 @@ rdnbr <- read.csv("C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheet
 cover.sub <- rdnbr %>% 
   separate(Plot, c("Storrie", "Chips", "plot"), remove = F)
 
-cover.sub$Storrie [cover.sub$Storrie==1] <- "low"
-cover.sub$Storrie [cover.sub$Storrie==2] <- "low" 
-cover.sub$Storrie [cover.sub$Storrie==3] <- "mod"
-cover.sub$Storrie [cover.sub$Storrie==4] <- "high"
+cover.sub$Storrie [cover.sub$Storrie==1] <- "un"
+cover.sub$Storrie [cover.sub$Storrie==2] <- "burned" 
+cover.sub$Storrie [cover.sub$Storrie==3] <- "burned"
+cover.sub$Storrie [cover.sub$Storrie==4] <- "burned"
 
-cover.sub$Chips [cover.sub$Chips==1] <- "low"
-cover.sub$Chips [cover.sub$Chips==2] <- "low" 
-cover.sub$Chips [cover.sub$Chips==3] <- "mod"
-cover.sub$Chips [cover.sub$Chips==4] <- "high"
+cover.sub$Chips [cover.sub$Chips==1] <- "un"
+cover.sub$Chips [cover.sub$Chips==2] <- "burned" 
+cover.sub$Chips [cover.sub$Chips==3] <- "burned"
+cover.sub$Chips [cover.sub$Chips==4] <- "burned"
 
 #combines severities from each fire into one column
 cover.sub <- cover.sub %>%
@@ -44,7 +46,6 @@ ccover <- spread(ccover.sum, key = "Spp", value = "cover", fill = 0.0)
 ccover <- ccover[,-1]
 
 #removes rare species
-library(labdsv)
 cover2 <- vegtab(taxa = ccover, minval = (.05*nrow(ccover)))
 
 #removes plots with no species present
@@ -52,15 +53,36 @@ Nozero <- data.frame(cover2, cover1)
 Nozero2 <- Nozero[rowSums(Nozero[,1:12])!=0,]
 
 cover2 <- Nozero2[,1:12]
-cover1 <- Nozero2[,13:16]
+cover1 <- Nozero2[,13:19]
 #########################################################
+#creates df of tree densities
+den.cent <- read.csv("C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/center sub plot.csv", header = T)
+
+#summarizes data sheet, giving total crown area per species for each plot
+cden.total <- den.cent %>%
+  group_by(plot, Spp) %>%
+  summarize(density = length(Spp))
+
+#transposes rows to columns
+cden <- spread(cden.total, key = "Spp", value = "density", fill = 0.0)
+#removes "plot" column
+cden <- cden[,-1]
+#removes rare spp
+cden2 <- vegtab(taxa = cden, minval = (.05*nrow(cden)))
+#removes all but trees
+cden2 <- cden2[,8:12]
+cden2 <- cden2[,-3]
+###########################################################
 #create spreadsheets####
 
-#saves data file of predictors, 16 combos, without 0 plots
+#saves data file of predictors, combos, without 0 plots
 write.csv(cover1, file="C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/cover1.csv", row.names = F)
 
 #saves data file of resulting reponse matrix, without 0 plots  -- 12 species left!####
 write.csv(cover2, file="C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/coverRaw.csv", row.names = F)
+
+#saves file of tree densities (93 plots!)
+write.csv(cden2, file="C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/density.csv", row.names = F)
 ######################################################################
 #other transformations: relative % cover, actual % cover
 

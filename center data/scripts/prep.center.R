@@ -12,14 +12,14 @@ cover.sub <- rdnbr %>%
   separate(Plot, c("Storrie", "Chips", "plot"), remove = F)
 
 cover.sub$Storrie [cover.sub$Storrie==1] <- "un"
-cover.sub$Storrie [cover.sub$Storrie==2] <- "burned" 
-cover.sub$Storrie [cover.sub$Storrie==3] <- "burned"
-cover.sub$Storrie [cover.sub$Storrie==4] <- "burned"
+cover.sub$Storrie [cover.sub$Storrie==2] <- "low" 
+cover.sub$Storrie [cover.sub$Storrie==3] <- "low"
+cover.sub$Storrie [cover.sub$Storrie==4] <- "high"
 
 cover.sub$Chips [cover.sub$Chips==1] <- "un"
-cover.sub$Chips [cover.sub$Chips==2] <- "burned" 
-cover.sub$Chips [cover.sub$Chips==3] <- "burned"
-cover.sub$Chips [cover.sub$Chips==4] <- "burned"
+cover.sub$Chips [cover.sub$Chips==2] <- "low" 
+cover.sub$Chips [cover.sub$Chips==3] <- "low"
+cover.sub$Chips [cover.sub$Chips==4] <- "high"
 
 #combines severities from each fire into one column
 cover.sub <- cover.sub %>%

@@ -65,7 +65,7 @@ PC2 <- pc.rdnbr$scores[,2]
 Storrie <- cover$storrie_rdnbr
 Chips <- cover$chips_rdnbr
 
-sev.fit <- envfit(z.sev ~ storrie+chips+PC1+PC2, data=cover, na.rm=T)
+sev.fit <- envfit(z.sev ~ Storrie+Chips+PC1+PC2, data=cover, na.rm=T)
 #aspect and elevation were not signif
 
 #overlays vectors onto rotated nmds
@@ -88,7 +88,7 @@ scores$comb <- cover$SC
 
 #add vectors
 vec.df<-as.data.frame(scores(sev.fit, display="vectors"))
-names <- c("Storrie severity (RdNBR)", "Chips severity (RdNBR)", "Combined severity", "Interaction")
+names <- c("Storrie severity (RdNBR)***", "Chips severity (RdNBR)**", "Combined severity", "Interaction**")
 vec.df$names <- names
 vec.df <-cbind(vec.df, names=rownames(vec.df))
 
@@ -104,7 +104,7 @@ ggplot()+
   ggtitle("NMDS with burn serverity combination providing color coding")+
   geom_segment(data=vec.df,aes(x=0,xend=NMDS1,y=0,yend=NMDS2),
                arrow = arrow(length = unit(.5, "cm")), colour="blue", size=1.5) + 
-  geom_text_repel(data=vec.df,aes(x=NMDS1,y=NMDS2,label=names), size=5, fontface="bold", point.padding = .7)+
+  geom_text_repel(data=vec.df,aes(x=NMDS1,y=NMDS2,label=names), size=5, fontface="bold", point.padding = 1.6)+
   coord_fixed()+
   theme(axis.text = element_blank(), axis.ticks = element_blank())+
   annotate("text", x=-.48, y=.75, label="CEIN", size=5, fontface="bold", hjust=0)+
@@ -114,8 +114,8 @@ ggplot()+
   annotate("text", x=-1.3, y=-.9, label="ABCO", size=5, fontface="bold", hjust=0)
   
   
-  
-ggplot(midstory2, aes(chips_rdnbr))+
+#old plot just for code  
+#ggplot(midstory2, aes(chips_rdnbr))+
   geom_col(aes(y=PSME), fill="red", position=position_dodge(width=5), width = 15)+
   geom_col(aes(y=ABCO), position = "dodge", fill="grey50", color="black", width = 15)+
   scale_x_continuous(breaks=seq(-500,999,125))+

@@ -40,7 +40,7 @@ plot(z.sev, display = "sites")
 cols <- rainbow(12)
 palette(cols)
 
-points(z.sev, col=cat, pch=20, cex=4)
+points(z.sev, col=domin, pch=20, cex=4)
 text(z.sev$points, labels=domin, col="black", cex=.9)
 legend('topright', legend = legs, col=cols)
 
@@ -65,7 +65,7 @@ PC2 <- pc.rdnbr$scores[,2]
 Storrie <- cover$storrie_rdnbr
 Chips <- cover$chips_rdnbr
 
-sev.fit <- envfit(z.sev ~ Storrie+Chips+PC1+PC2, data=cover, na.rm=T)
+sev.fit <- envfit(z.sev ~ Storrie+Chips+PC2, data=cover, na.rm=T)
 #aspect and elevation were not signif
 
 #overlays vectors onto rotated nmds
@@ -84,43 +84,53 @@ draw.ellipse(-.6, -.85, a=.7, b=.2, border = "black", lwd=2) #abco/quke
 scores <- as.data.frame(scores(z.sev, "sites"))
 #scores$species <- rownames(scores)
 #pal = c('#a50026','#d73027','#f46d43','#fdae61','#fee08b','#ffffbf','#d9ef8b','#a6d96a','#66bd63','#1a9850','#006837')
+pal = c('#e41a1c','#377eb8','#4daf4a','#984ea3','#ff7f00','#ffff33','#a65628','#f781bf','#999999','#66bd63','#1a9850','#006837')
+
+
 scores$comb <- cover$SC
+scores$dom <- dom$abun
 
 #add vectors
 vec.df<-as.data.frame(scores(sev.fit, display="vectors"))
-names <- c("Storrie severity (RdNBR)***", "Chips severity (RdNBR)**", "Combined severity", "Interaction**")
+names <- c("Storrie Fire severity***", "Chips Fire severity**", "Interaction**")
 vec.df$names <- names
 vec.df <-cbind(vec.df, names=rownames(vec.df))
 
-ggplot()+
-  geom_point(data=scores,aes(x=NMDS1,y=NMDS2, colour=scores$comb),size=4) + 
-  scale_color_brewer(palette = "Set1", name="Severity combinations")+
+a <- ggplot()+
+  geom_point(data=scores,aes(x=NMDS1,y=NMDS2, colour=scores$dom), size=4) + 
+  scale_color_manual(values = pal)+
   theme_classic()+
   theme (panel.border = element_rect(fill = NA))+
   theme(plot.title = element_text(hjust = 0.5))+
-  theme(axis.title = element_text(size=18), axis.text = element_text(size=12, color="black"))+
-  theme(legend.text = element_text(size=12), legend.title = element_text(size=16),
-        legend.background = element_blank())+
-  ggtitle("NMDS with burn serverity combination providing color coding")+
+  theme(axis.title = element_text(size=18))+
+  theme(legend.position = 'none')+
+  #ggtitle("NMDS with burn serverity combination providing color coding")+
   geom_segment(data=vec.df,aes(x=0,xend=NMDS1,y=0,yend=NMDS2),
                arrow = arrow(length = unit(.5, "cm")), colour="blue", size=1.5) + 
-  geom_text_repel(data=vec.df,aes(x=NMDS1,y=NMDS2,label=names), size=5, fontface="bold", point.padding = 1.6)+
+  geom_text_repel(data=vec.df,aes(x=NMDS1,y=NMDS2,label=names), size=5, fontface="bold", colour="blue", point.padding = 1.6)+
   coord_fixed()+
-  theme(axis.text = element_blank(), axis.ticks = element_blank())+
-  annotate("text", x=-.48, y=.75, label="CEIN", size=5, fontface="bold", hjust=0)+
-  annotate("text", x=.6, y=-.7, label="CECO", size=5, fontface="bold", hjust=0)+
-  annotate("text", x=-.5, y=-.9, label="QUKE", size=5, fontface="bold", hjust=0)+
-  annotate("text", x=-1, y=-.25, label="PSME", size=5, fontface="bold", hjust=0)+
-  annotate("text", x=-1.3, y=-.9, label="ABCO", size=5, fontface="bold", hjust=0)
+  #theme(axis.text = element_blank(), axis.ticks = element_blank())+
+  annotate("text", x=-.48, y=.75, label="CEIN", size=6, fontface="bold", hjust=0)+
+  annotate("text", x=.6, y=-.7, label="CECO", size=6, fontface="bold", hjust=0)+
+  annotate("text", x=-.5, y=-.8, label="QUKE", size=6, fontface="bold", hjust=0)+
+  annotate("text", x=-.6, y=-1.7, label="PSME", size=6, fontface="bold", hjust=0)+
+  annotate("text", x=-1.3, y=-.85, label="ABCO", size=6, fontface="bold", hjust=0)
   
+setwd("C:/Users/dnemens/Dropbox/CBO/chaparral/plots")
+ggsave(plot=a, "nmds.sppcols.tiff", width=25, height=20, units="cm", device = "tiff")
   
+
+#inside aes : , colour=scores$comb
+#scale_color_brewer(palette = "Set1", name="Severity combinations")+
+#theme(legend.text = element_text(size=12), legend.title = element_text(size=16),
+   #   legend.background = element_blank())+
 #old plot just for code  
 #ggplot(midstory2, aes(chips_rdnbr))+
-  geom_col(aes(y=PSME), fill="red", position=position_dodge(width=5), width = 15)+
-  geom_col(aes(y=ABCO), position = "dodge", fill="grey50", color="black", width = 15)+
-  scale_x_continuous(breaks=seq(-500,999,125))+
-  coord_cartesian(xlim=c(-470, 900))+
-  scale_y_continuous(limits = c(0,61), expand = c(0, 0))+
+  #geom_col(aes(y=PSME), fill="red", position=position_dodge(width=5), width = 15)+
+  #geom_col(aes(y=ABCO), position = "dodge", fill="grey50", color="black", width = 15)+
+  #scale_x_continuous(breaks=seq(-500,999,125))+
+  #coord_cartesian(xlim=c(-470, 900))+
+  #scale_y_continuous(limits = c(0,61), expand = c(0, 0))+
   theme_classic()+
   theme (panel.border = element_rect(fill = NA))+
   geom_vline(xintercept = 69)+
